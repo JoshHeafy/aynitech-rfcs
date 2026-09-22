@@ -34,6 +34,10 @@ Status values: `draft` · `active` (in discussion) · `accepted` · `rejected` �
 
 See [`/adr/README.md`](./adr/README.md) for the full list of architecture decisions.
 
+## Herramientas
+
+- [`tools/guild_post.py`](./tools/guild_post.py): CLI para armar un "Tech Share" (recurso técnico + TL;DR + por qué importa) listo para publicar en `#guild-engineering`, en modo interactivo o no interactivo (invocable desde un agente). No requiere dependencias externas. Ver [`tools/README.md`](./tools/README.md) para el formato del mensaje y ejemplos de uso.
+
 ## Guild Leads
 
 - [@Ausubel](https://github.com/Ausubel)
