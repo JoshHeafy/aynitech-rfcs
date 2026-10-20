@@ -1,12 +1,12 @@
 - Feature Name: `adr_governance`
 - Start Date: 2026-10-07
 - RFC PR: (leave empty, filled in once the PR is opened)
-- Status: draft
+- Status: active (in discussion)
 - Origin: Kriptex platform `CLAUDE.md` §"Architecture decisions require an ADR" and §"Sources of truth" (internal); Kriptex gitops `docs/adr/README.md` and `CLAUDE.md` (internal); Kriptex platform and gitops `ADR-000-template.md` (internal)
 
 # Summary
 
-Define one set of rules, shared by Kriptex and AyniFX, for when an Architecture Decision Record (ADR) is required, who may accept it, how it is numbered, how it changes over time, where it lives (product repo vs. this guild repo), and which document wins when an ADR, a product spec and an issue disagree. The RFC also proposes a single ADR template for both teams.
+Define one set of rules for every Aynitech project, for when an Architecture Decision Record (ADR) is required, who may accept it, how it is numbered, how it changes over time, where it lives (product repo vs. this guild repo), and which document wins when an ADR, a product spec and an issue disagree. The RFC also proposes a single ADR template, in English and Spanish.
 
 # Motivation
 
@@ -18,7 +18,7 @@ Kriptex already runs ADRs in two repos (application platform and GitOps infrastr
 - **Decisions in comments.** Infra decisions lived as long YAML header comments. A comment cannot record the rejected options, who accepted the decision, or when it was superseded, and nobody can find it without knowing which file to open.
 - **AI agents.** Both teams use coding agents. An agent that hits an architectural fork will pick one option and keep going unless it is told to stop.
 
-AyniFX has no formal ADR practice yet. If we do nothing, each team keeps (or invents) its own rules, ADRs stop being comparable across the guild, and cross-team decisions (shared auth, API contracts consumed by the Flutter app) have no home.
+Most other Aynitech projects — AyniFX, and the projects in flight under SDF — have no formal ADR practice yet (to be confirmed with SDF). If we do nothing, each team keeps (or invents) its own rules, ADRs stop being comparable across the guild, and cross-team decisions (shared auth, API contracts consumed by the Flutter app) have no home. The cost of doing nothing is the same one Kriptex already paid: decisions cited as binding with no record, specs that silently reverse architecture, and agents choosing forks on their own.
 
 # Guide-level explanation
 
@@ -45,27 +45,34 @@ If you are not sure, write the ADR. A short ADR is cheap; an unrecorded decision
 - **A human accepts an ADR.** Anyone, human or agent, may draft one.
 - **AI agents never self-accept.** When an agent reaches a decision it would need to make to continue, it **stops**, presents the concrete options with pros and cons, and waits. After a human decides, the agent records the decision and follows it.
 - The `Deciders` field always names people, never a tool.
+- **Acceptance is auditable.** The `Proposed` → `Accepted` change is made (or explicitly approved) by the person named in `Deciders`, in the ADR's PR. An ADR whose status flips without that person acting is not accepted, no matter what the line says.
 
 ## Changing a decision
 
 An Accepted ADR is **binding** on code, agents and reviews. To change it, write a **new** ADR that supersedes the old one and update the old one's status line to `Superseded by ADR-NNN`. Never rewrite the decision of an Accepted ADR in place. Typos and broken links may be fixed in place.
 
-Exception: an ADR that has **not yet merged** to the integration branch can still be amended in its PR.
+Exception: an ADR that has **not yet merged** to its project's integration branch can still be amended in its PR. The integration branch is `main` in this guild repo and each product repo's own integration branch (e.g. `dev` in Kriptex).
 
 ## Numbering
 
-Never trust a remembered "next number". Compute it from the directory:
+Numbering differs by location, and both rules are directory-based — never trust a remembered "next number".
+
+**In `docs/adr/` of each product repo:** files are `ADR-NNN-<slug>.md` with three digits, computed from the directory:
 
 ```bash
 ls docs/adr/ADR-*.md | sed -E 's@.*/ADR-0*([0-9]+).*@\1@' | sort -n | tail -1
 ```
 
-Then add one, zero-padded to three digits. **Before committing, check the open PRs** for ADRs that already reserved that number. If two branches still collide, the one that merges second renumbers. Always cite an ADR by its full slug (`ADR-012-bdd-tooling`), never the bare number, and always say which repo it belongs to when citing across repos (numbers are per repo).
+Then add one, zero-padded to three digits. **Before committing, check the open PRs** for ADRs that already reserved that number. If two branches still collide, the one that merges second renumbers.
+
+**In `adr/` of this guild repo:** numbering follows [`adr/README.md`](../adr/README.md) — four digits (`00XX-<slug>.md`), assigned at merge time (the file keeps `0000` until then).
+
+Always cite an ADR by its full slug (`ADR-012-bdd-tooling`), never the bare number, and always say which repo it belongs to when citing across repos (numbers are per repo).
 
 ## Where an ADR lives
 
 - **Product repo** (`docs/adr/` in the service repo or the infra repo): the decision affects one team's system. This is the default.
-- **Guild repo** (`adr/` in `aynitech-rfcs`): the decision binds **both** teams or more than one product, e.g. a shared auth provider, a cross-team API contract, a common CI policy. Usually an Accepted RFC in this repo produces a guild ADR.
+- **Guild repo** (`adr/` in `aynitech-rfcs`): the decision binds **more than one team or project**, e.g. a shared auth provider, a cross-team API contract, a common CI policy. Usually an Accepted RFC in this repo produces a guild ADR.
 
 A product ADR may reference a guild ADR; a guild ADR should not depend on a product ADR that the other team cannot read. Describe the referenced decision in plain text instead.
 
@@ -75,11 +82,11 @@ Three systems hold binding content, split by the kind of claim each can settle:
 
 | System | Owns |
 | --- | --- |
-| Product spec (Kriptex uses Notion) | what the thing does: invariants, edge cases, worked examples |
+| Product spec (each project's spec tool: Notion, ACTIVITIES, …) | what the thing does: invariants, edge cases, worked examples |
 | ADRs in the repo | architecture and boundaries: ownership, contracts, cross-cutting patterns |
-| Issue tracker (Kriptex uses Linear) | acceptance criteria and issue status |
+| Issue tracker (each project's tracker: Linear, ACTIVITIES, …) | acceptance criteria and issue status |
 
-**When a product spec contradicts an Accepted ADR, the ADR wins.** Whoever is slicing the spec into issues, code or `.feature` files stops and surfaces the conflict. A human resolves it by revising the spec or by accepting a superseding ADR. Corollaries:
+**When a product spec contradicts an Accepted ADR, the Accepted ADR stays in force until a human resolves the conflict**, by revising the spec or by accepting a superseding ADR. The ADR does not silently apply itself: whoever is slicing the spec into issues, code or `.feature` files **stops and surfaces the conflict**, and a human decides how it is resolved. Corollaries:
 
 - A spec names the ADRs that constrain it near the top.
 - A decision cited as binding must exist as an ADR, and the citation must point at the record that decides it.
@@ -89,7 +96,7 @@ Three systems hold binding content, split by the kind of claim each can settle:
 
 ## Proposed ADR template
 
-This replaces the current `adr/0000-template.md` once this RFC is accepted. It merges the Kriptex platform and gitops templates; `Blast radius` comes from the infra variant and is optional elsewhere.
+This replaces the current `adr/0000-template.md` once this RFC is accepted. It ships in two files with identical structure, fields and rules: [`adr/0000-template.md`](../adr/0000-template.md) in English and [`adr/0000-template.es.md`](../adr/0000-template.es.md) in Spanish, side by side in `adr/`. English is the template for Kriptex and any English-writing project; Spanish is the template for every other project. The template merges the Kriptex platform and gitops variants; `Blast radius` ("Radio de impacto" in the Spanish version) comes from the infra variant and is optional elsewhere. On acceptance, Kriptex's `docs/adr/ADR-000-template.md` (platform and gitops) is updated to match this template, so its 170+ existing ADRs and the new ones read the same.
 
 ```markdown
 # ADR-NNN: <short decision title>
@@ -104,7 +111,7 @@ This replaces the current `adr/0000-template.md` once this RFC is accepted. It m
 What forces the decision? The problem, the constraints, and why it can't be deferred.
 Link the evidence (incident, benchmark, failing pipeline) in plain text.
 
-## Alternatives considered
+## Options considered
 
 ### Option A — <name>
 - Pros:
@@ -150,11 +157,11 @@ Proposed ──(human accepts)──▶ Accepted ──(new ADR)──▶ Supers
 - `Proposed`: open PR, under discussion. Agents may write this status.
 - `Accepted`: set by a human, in the PR that merges it or a follow-up.
 - `Superseded by …`: set when the replacing ADR is accepted. Partial supersession is allowed and must say which part ("storage part superseded by ADR-NNN-…").
-- `Deprecated`: the decision no longer applies and nothing replaces it.
+- `Deprecated`: the decision no longer applies and nothing replaces it. A human sets this status, and the reason must be written down — a short ADR ("ADR-NNN retires ADR-NNN without replacement, because X") records the why in the same place a supersession does. A decision that stops applying without a record is just an unrecorded decision again.
 
 ## Index
 
-Each `docs/adr/` keeps a `README.md` with an index table (ADR, title, status, date) and a short "decisions that still need an ADR" list so pending decisions are not lost.
+Every project that adopts this format keeps a `docs/adr/README.md` with an index table (ADR, title, status, date) and a short "decisions that still need an ADR" list so pending decisions are not lost. This is what `docs/adr/README.md` already does in Kriptex, and it is a requirement for adoption, not a suggestion.
 
 ## Enforcement
 
@@ -164,7 +171,10 @@ Today this is soft enforcement: instructions in `CLAUDE.md` / `AGENTS.md` for ag
 
 - Existing ADRs stay as they are; no renumbering.
 - New ADRs use the new template from the date this RFC is accepted.
-- AyniFX creates `docs/adr/` with an index and the template in its backend and app repos.
+- Adoption by group:
+  - **R&D teams (Kriptex and AyniFX):** from acceptance. Each project creates `docs/adr/` with an index and the template in its repos, in the template language that applies (English for Kriptex, Spanish elsewhere).
+  - **Technical contracts reviewed by the guild:** from now, starting with ISC v4.
+  - **SDF projects in flight:** in the methodology sessions.
 
 # Drawbacks
 
@@ -182,8 +192,7 @@ Today this is soft enforcement: instructions in `CLAUDE.md` / `AGENTS.md` for ag
 
 # Unresolved questions
 
-- Should the guild repo's `adr/` use its own numbering or a prefix (`GADR-NNN`) to avoid confusion with per-repo numbers?
 - Do we want the CI uniqueness/supersession check now, or after a few months of manual practice?
-- Language of ADRs: Kriptex writes some in Spanish and some in English. Do guild ADRs have to be in English?
+- Language of ADRs: Kriptex writes in English, every other project in Spanish, with the same fields and rules; this is settled. Open: the language of **guild** ADRs, which cross projects — Spanish, as the common language of all teams?
 - **Flutter / AyniFX gaps:** AyniFX has no ADR directory yet. Which repo holds decisions that span the Go backend and the Flutter app (e.g. state management, offline sync, API versioning for app store releases that can't be force-updated)? A mobile release cycle makes "expensive to reverse" broader than on the web.
 - Out of scope: RFC process itself (see `rfcs/0000-template.md` and the repo README).

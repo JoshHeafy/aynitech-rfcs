@@ -16,7 +16,7 @@ Check the RFC Index in [`README.md`](./README.md) and open PRs to avoid duplicat
 
 - PR title: `RFC: <short title>`.
 - The PR description should link to (or embed) the motivation summary.
-- Tag the Guild Leads (`@Ausubel`, `@Joshar`) as reviewers.
+- Tag the Guild Leads (`@Ausubel`, `@JoshHeafy`) as reviewers.
 
 ## 4. Discussion window — 5 business days
 
