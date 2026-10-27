@@ -41,4 +41,4 @@ See [`/adr/README.md`](./adr/README.md) for the full list of architecture decisi
 ## Guild Leads
 
 - [@Ausubel](https://github.com/Ausubel)
-- [@Joshar](https://github.com/Joshar)
+- [@JoshHeafy](https://github.com/JoshHeafy)
