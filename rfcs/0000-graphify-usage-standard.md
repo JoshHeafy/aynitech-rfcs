@@ -1,6 +1,6 @@
 - Feature Name: `graphify_usage_standard`
 - Start Date: 2026-11-06
-- RFC PR: (leave empty, filled in once the PR is opened)
+- RFC PR: https://github.com/JoshHeafy/aynitech-rfcs/pull/4
 - Status: draft
 - Origin: Observed usage in two local engineering workspaces (one single-repo project, one folder that holds several repos), graphify `0.9.38`, on 2026-11-06
 
